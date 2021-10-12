@@ -40,7 +40,8 @@ def newCatalog(type):
     """
     catalog = {'artworks': None,
                'artists': None,
-               'medium': None}
+               'medium': None,
+               'obbyArt': None}
 
     """
     """
@@ -52,6 +53,11 @@ def newCatalog(type):
                                    maptype='CHAINING',
                                    loadfactor=4.0,
                                    comparefunction=compareMedio)
+    catalog['obbyArt'] = mp.newMap(10000,
+                                   maptype='CHAINING',
+                                   loadfactor=4.0,
+                                   comparefunction=compareArtist)
+
     return catalog
 
 #==========================
@@ -61,17 +67,22 @@ def newCatalog(type):
 def addArtwork(catalog,artwork):
     lt.addLast(catalog["artworks"], artwork)
     addArtworkMedium(catalog,artwork)
+    addArtworkbyArtist(catalog,artwork)
+
+def addArtist(catalog,artist):
+    lt.addLast(catalog["artists"], artist)
 
 def addArtworkMedium(catalog,artwork):
     """
     Esta funcion adiciona una obra a la lista de obras que usan un medio especifico.
-    Los medios se guardan en un Map, donde la llave es el medio y el valor la lista de obras de ese medio.
+    Los datos se guardan en un Map, donde la llave es el medio y el valor la lista de obras de ese medio.
     """
     medios = catalog['medium']
     if artwork['Medium'] != '':
         medio = artwork['Medium']
     else:
         medio = "Ninguno"
+
     existmedio = mp.contains(medios,medio)
     if existmedio:
         entry = mp.get(medios,medio)
@@ -90,12 +101,52 @@ def newMedio(medio):
     entry['obras'] = lt.newList('SINGLE_LINKED', compareDate)
     return entry
 
-def addArtist(catalog,artist):
-    lt.addLast(catalog["artists"], artist)
+def addArtworkbyArtist(catalog,artwork):
+    """
+    Agregar las obras correspondientes a cada artista en el Map catalog['obbyArt']
+    """
+    mapa = catalog['obbyArt']
+    if artwork['ConstituentID'] != '':
+        ide = artwork['ConstituentID']
+    else:
+        ide = "[0]"
+    
+    ides = ide.strip('[]')
+    artistas = ides.split(',')
+
+    for artista in artistas:
+        existartista = mp.contains(mapa,artista)
+        if existartista:
+            entry = mp.get(mapa,artista)
+            artist = me.getValue(entry)
+        else:
+            artist = newArtista(artista)
+            mp.put(mapa, artista, artist)
+        lt.addLast(artist['obras'], artwork)
+
+def newArtista(artista):
+    """
+    Esta funcion crea la estructura de obras asociadas a un artista.
+    """
+    entry = {'artista': "", "obras": None}
+    entry['artista'] = artista
+    entry['obras'] = lt.newList('SINGLE_LINKED', compareDate)
+    return entry
 
 #=================================
 # consultar info, modificar datos
 #=================================
+
+def getElementbyparameter(lista, parameter):
+    """
+    Retorna un elemento de una lista dado un parametro, no lo elimina de la lista
+    """
+    pos = lt.isPresent(lista, parameter)
+    if pos > 0:
+        element = lt.getElement(lista, pos)
+        return element
+    else:
+        return None
 
 def getElementbyparameterE(lista, parameter):
     """
@@ -153,6 +204,12 @@ def compareMedio(medio, medentry):
         return 0
     return -1
 
+def compareArtist(artist,artentry):
+    artentry = me.getKey(artentry)
+    if (str(artentry) == str(artist)):
+        return 0
+    return -1
+
 def compareDate(date,artwork):
     if date in artwork['Date']:
         return 0
@@ -160,6 +217,16 @@ def compareDate(date,artwork):
 
 def compareAnio(anio, artist):
     if anio in artist["BeginDate"]:
+        return 0
+    return -1
+
+def compareNames(nombre,artist):
+    if nombre in artist["DisplayName"]:
+        return 0
+    return -1
+
+def compareMedium(medium, artwork):
+    if (medium in artwork["Medium"]):
         return 0
     return -1
 
@@ -196,6 +263,78 @@ def lastThreeD(lista):
     """
     last = lt.subList(lista,lt.size(lista)-2,3)
     return last
+
+#------------------
+# requerimiento 3
+#------------------
+
+def artworksbyArtist(catalog,nombre):
+    """
+    Retorna una lt con las obras de un artista por su nombre.
+    """
+    copia = copiarLista(catalog['artists'],compareNames)
+    artista = getElementbyparameter(copia,nombre)
+    ide = artista['ConstituentID']
+    artist = mp.get(catalog['obbyArt'], ide)
+    if artist:
+        obras = me.getValue(artist)['obras']
+    return obras
+
+def listaMedios(obras):
+    """
+    Retorna lista con representantes unicos para cada medio que se usa en una lista de obras 
+    """
+    first = lt.firstElement(obras)
+    medios = lt.newList("SINGLE_LINKED",cmpfunction=compareMedium)
+    lt.addFirst(medios,first)        
+    for obra in lt.iterator(obras):
+        i = 0
+        for medio in lt.iterator(medios):
+            if (str(obra['Medium']) == str(medio['Medium'])):
+                i += 1
+        if (i == 0):
+            lt.addLast(medios,obra)
+    return medios
+    
+def artworksbyMedium(obras):
+    """
+    Retorna un lt con las obras que usan la tecnica o medio mas recurrente en obras.
+    """
+    # contamos numero de veces que aparece cada medio y agregamos este numero a una lista (numeros)
+    medios = listaMedios(obras)
+    numeros = lt.newList()
+    for medio in lt.iterator(medios):
+        i = 0
+        for obra in lt.iterator(obras):
+            if (medio['Medium'] == obra['Medium']):
+                i += 1
+        lt.addLast(numeros,i)
+    # ordenamos la lista y sacamos el numero mas grande
+    ms.sort(numeros,cmpfunction=ordenAscendente)
+    num = lt.lastElement(numeros)
+    # hallamos el medio (medio) correspondiente a este numero mas grande (num)
+    for medio in lt.iterator(medios):
+        i = 0
+        for obra in lt.iterator(obras):
+            if (medio['Medium'] == obra['Medium']):
+                i += 1
+        if i is num:
+            break
+    # hacemos una lista (lista) con las obras que usan el medio hallado (medio)
+    lista = lt.newList()
+    if medio is not None:
+        for obra in lt.iterator(obras):
+            if (obra['Medium'] ==  medio['Medium']):
+                lt.addLast(lista,obra)
+        return lista
+
+def contarMedios(obras):
+    """
+    Cuenta la cantidad de medios que se usan en una lista de obras
+    """
+    medios = listaMedios(obras)
+    num = lt.size(medios)
+    return num 
 
 #--------
 # lab 5

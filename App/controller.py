@@ -23,6 +23,7 @@
 import config as cf
 import model
 import csv
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -51,15 +52,6 @@ def loadData(catalog):
     """
     loadArtists(catalog)
     loadArtworks(catalog)
-    
-def loadArtworks(catalog):
-    """
-    Carga las obras del archivo.
-    """
-    booksfile = cf.data_dir + 'MoMA/Artworks-utf8-small.csv'
-    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
-    for artwork in input_file:
-        model.addArtwork(catalog, artwork)   
 
 def loadArtists(catalog):
     """
@@ -69,6 +61,15 @@ def loadArtists(catalog):
     input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtist(catalog, artist)
+    
+def loadArtworks(catalog):
+    """
+    Carga las obras del archivo.
+    """
+    booksfile = cf.data_dir + 'MoMA/Artworks-utf8-small.csv'
+    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
+    for artwork in input_file:
+        model.addArtwork(catalog, artwork) 
 
 #=================
 # requerimientos
@@ -92,6 +93,31 @@ def lastThreeD(catalog):
     """
     """
     return model.lastThreeD(catalog)
+
+#-----------------
+# requerimiento 3
+#-----------------
+
+def artworksbyArtist(catalog,nombre):
+    """
+    """
+    return model.artworksbyArtist(catalog,nombre)
+
+def artworksbyMedium(obras):
+    """
+    """
+    return model.artworksbyMedium(obras)
+
+def contarMedios(obras):
+    """
+    """
+    return model.contarMedios(obras)
+
+def medioMax(obras):
+    """
+    """
+    medio = lt.firstElement(obras)
+    return medio['Medium']
 
 #--------
 # lab 5

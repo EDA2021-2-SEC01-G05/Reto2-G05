@@ -40,6 +40,7 @@ def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- Listar cronologicamente los artistas")
+    print("4- Clasificar las obras de los artistas por tecnica")
     print("3- Ver las n obras mas antiguas para un medio especifico")
     print("0-  Salir")
     
@@ -82,6 +83,16 @@ def printArtistData_Req1(artists):
     else:
         print ("No se encontraron artistas")
 
+def printArtworkData_Req3(artworks):
+    size = lt.size(artworks)
+    if size>0:
+        for artwork in lt.iterator(artworks):
+            print ("ID: " + artwork["ObjectID"] + ", Título: " + artwork["Title"] 
+                    + ", Fecha:  " + artwork["Date"] + ", Medio: " 
+                    + artwork["Medium"] + ", Dimensiones: " + artwork["Dimensions"])
+    else:
+        print ("No se encontraron artistas")
+
 #=================
 # requerimientos
 #=================
@@ -108,6 +119,21 @@ def requerimiento1(catalog, anio_inicial, anio_final):
     printArtistData_Req1(last)
     print("-" * 50)
 
+def requerimiento3(catalog,nombre):
+    artworks = controller.artworksbyArtist(catalog,nombre)
+    print("\n")
+    print("Total de obras del artista " + str(nombre) + ": " + str(lt.size(artworks)))
+    lista = controller.artworksbyMedium(artworks)
+    medios = controller.contarMedios(artworks)
+    medio_max = controller.medioMax(lista)
+    print("-" * 50)
+    print("Total de medios usados por el artista en sus obras: " + str(medios))
+    print("-" * 50)
+    print("La técnica más usada por el artista es: " + str(medio_max))
+    print("-" * 50)
+    print("Listado de obras con la técnica más usada: ")
+    printArtworkData_Req3(lista)
+    
 #=================
 # Menu principal
 #=================
@@ -116,12 +142,16 @@ while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
+        start_time = time.process_time()
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
         loadData(catalog)
         print("-" * 74)
         print('Obras cargadas: ' + str(lt.size(catalog['artworks']))+ "\n")
         print('Artistas cargados: ' + str(lt.size(catalog['artists'])) + "\n")
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("Tiempo de ejecución: " + str(elapsed_time_mseg))
 
     elif int(inputs[0]) == 2:
         anio_inicial = input("Ingrese el año inicial: ")
@@ -136,6 +166,15 @@ while True:
         n = input("Ingrese el numero de obras que quiere ver: ")
         medio = input("Ingrese el medio o tecnica: ")
         lab5(catalog,n,medio)
+        
+
+    elif int(inputs[0]) == 4:
+        nombre = input("Ingrese el nombre del artista: ")
+        start_time = time.process_time()
+        requerimiento3(catalog,nombre)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("Tiempo de ejecución: " + str(elapsed_time_mseg))
 
     else:
         sys.exit(0)
