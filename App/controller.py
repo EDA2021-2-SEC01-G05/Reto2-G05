@@ -74,6 +74,29 @@ def loadArtists(catalog):
 # requerimientos
 #=================
 
+#-----------------
+# requerimiento 1
+#-----------------
+
+def artistsbyAnio(catalog,anio_inicial,anio_final):
+    """
+    """
+    return model.artistsbyAnio(catalog,anio_inicial,anio_final)
+
+def firstThreeD(catalog):
+    """
+    """
+    return model.firstThreeD(catalog)
+
+def lastThreeD(catalog):
+    """
+    """
+    return model.lastThreeD(catalog)
+
+#--------
+# lab 5
+#--------
+
 def obrasAntiguas(catalog,n,medio):
     """
     """

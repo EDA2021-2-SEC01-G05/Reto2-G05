@@ -28,7 +28,7 @@ import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
-from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import mergesort as ms
 assert cf
 
 #=========================
@@ -109,12 +109,26 @@ def getElementbyparameterE(lista, parameter):
     else:
         return None
 
+def copiarLista(lista, cmpf):
+    """
+    Copia una lista con nueva cmpfunction cmpf
+    """
+    copia = lt.newList("ARRAY_LIST",cmpf)
+    for elemento in lt.iterator(lista):
+        lt.addLast(copia,elemento)
+    return copia
+
 #==========================
 # funciones de comparacion
 #==========================
 
 def ordenAscendente(a,b):
     if (a > b):
+        return 0
+    return -1
+
+def ordAscArtAnio(a,b):
+    if int(a['BeginDate']) > int(b['BeginDate']):
         return 0
     return -1
 
@@ -144,9 +158,48 @@ def compareDate(date,artwork):
         return 0
     return -1
 
+def compareAnio(anio, artist):
+    if anio in artist["BeginDate"]:
+        return 0
+    return -1
+
 #================
 # requerimientos
 #================
+
+#-----------------
+# requerimiento 1
+#-----------------
+
+def artistsbyAnio(catalog,anio_inicial,anio_final):
+    """
+    Organiza y retorna los artistas que esten en un rango de una fecha inicial y final.
+    """
+    artistas = copiarLista(catalog['artists'],compareAnio)
+    ms.sort(artistas,ordAscArtAnio)
+    pos = lt.isPresent(artistas,str(anio_inicial))
+    pos_f = lt.isPresent(artistas,str(anio_final))
+    l = int(pos_f)-int(pos)
+    artistas = lt.subList(artistas,pos,l+2)
+    return artistas
+
+def firstThreeD(lista):
+    """
+    Retorna una lista con los tres primeros elementos de una lista.
+    """
+    first = lt.subList(lista,1,3)
+    return first
+
+def lastThreeD(lista):
+    """
+    Retorna una lista con los 3 ultimos elementos de una lista.
+    """
+    last = lt.subList(lista,lt.size(lista)-2,3)
+    return last
+
+#--------
+# lab 5
+#--------
 
 def obrasAntiguas(catalog,n,medio):
     """
@@ -159,7 +212,7 @@ def obrasAntiguas(catalog,n,medio):
         obras = me.getValue(medio)['obras']
     for obra in lt.iterator(obras):
         lt.addLast(fechas,int(obra['Date']))
-    sa.sort(fechas,ordenAscendente)
+    ms.sort(fechas,ordenAscendente)
     i = 0
     while i < int(n):
         fecha = lt.removeFirst(fechas)

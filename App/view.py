@@ -39,7 +39,8 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- Ver las n obras mas antiguas para un medio especifico")
+    print("2- Listar cronologicamente los artistas")
+    print("3- Ver las n obras mas antiguas para un medio especifico")
     print("0-  Salir")
     
 def initCatalog():
@@ -71,6 +72,16 @@ def printArtworkData(artworks):
     else:
         print ("No se encontraron obras")
 
+def printArtistData_Req1(artists):
+    size = lt.size(artists)
+    if size>0:
+        for artist in lt.iterator(artists):
+            print ("Nombre: " + artist["DisplayName"] + ", Año nacimiento:  " 
+                    + artist["BeginDate"] + ", Año fallecimiento: " + artist["EndDate"]
+                    + ", Nacionalidad: " + artist["Nationality"] + ", Género: " + artist["Gender"])
+    else:
+        print ("No se encontraron artistas")
+
 #=================
 # requerimientos
 #=================
@@ -78,6 +89,24 @@ def printArtworkData(artworks):
 def lab5(catalog,n,medio):
     obras = controller.obrasAntiguas(catalog,n,medio)
     printArtworkData(obras)
+
+def requerimiento1(catalog, anio_inicial, anio_final):
+    """
+    Genera una lista cronológicamente ordenada de los artistas en un rango de anios.
+    Retorna el total de artistas en el rango cronológico, y los primeros 3 y ultimos 3 artistas del rango.
+    """
+    org_anio = controller.artistsbyAnio(catalog, anio_inicial, anio_final)
+    print("\n")
+    print("Total de artistas en el rango " + str(anio_inicial) + " - " + str(anio_final) + ": " + str(lt.size(org_anio)))
+    print("-" * 50)
+    last = controller.lastThreeD(org_anio)
+    first = controller.firstThreeD(org_anio)
+    print ("  Estos son los 3 primeros Artistas encontrados: ")
+    printArtistData_Req1(first)
+    print("-" * 50)
+    print ("  Estos son los 3 ultimos Artistas encontrados: ")
+    printArtistData_Req1(last)
+    print("-" * 50)
 
 #=================
 # Menu principal
@@ -95,6 +124,15 @@ while True:
         print('Artistas cargados: ' + str(lt.size(catalog['artists'])) + "\n")
 
     elif int(inputs[0]) == 2:
+        anio_inicial = input("Ingrese el año inicial: ")
+        anio_final = input("Ingrese el año final: ")
+        start_time = time.process_time()
+        requerimiento1(catalog, anio_inicial, anio_final)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("Tiempo de ejecución: " + str(elapsed_time_mseg))
+
+    elif int(inputs[0]) == 3:
         n = input("Ingrese el numero de obras que quiere ver: ")
         medio = input("Ingrese el medio o tecnica: ")
         lab5(catalog,n,medio)
