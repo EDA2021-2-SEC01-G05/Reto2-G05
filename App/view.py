@@ -144,10 +144,11 @@ def requerimiento3(catalog,nombre):
 
 def requerimiento5(catalog,department):
     obras = controller.artworksbyDepartment(catalog,department)
-    total = controller.costoTotal(obras)
+    resultado = controller.costoTotal_masCostosas(obras)
+    total = lt.removeFirst(resultado)
+    costosas = lt.removeLast(resultado)
     peso = controller.pesoTotal(obras)
     antiguas = controller.masAntiguas(obras)
-    costosas = controller.masCostosas(obras)
     print('Total de obras para transportar: ' + str(lt.size(obras)))
     print("-" * 50)
     print('Costo total estimado de transportar las obras (USD): ' + str(total))
@@ -156,7 +157,7 @@ def requerimiento5(catalog,department):
     print("-" * 50)
     print('Las 5 obras más antiguas a transportar son: ')
     print("-" * 50)
-    printArtworkData_Req5(antiguas)
+    printArtworkData_Req5(antiguas) 
     print("-" * 50)
     print('Las 5 obras más costosas a transportar son: ')
     print("-" * 50)

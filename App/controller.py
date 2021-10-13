@@ -57,7 +57,7 @@ def loadArtists(catalog):
     """
     Carga los artistas.
     """
-    booksfile = cf.data_dir + 'MoMA/Artists-utf8-small.csv'
+    booksfile = cf.data_dir + 'MoMA/Artists-utf8-large.csv'
     input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtist(catalog, artist)
@@ -66,7 +66,7 @@ def loadArtworks(catalog):
     """
     Carga las obras del archivo.
     """
-    booksfile = cf.data_dir + 'MoMA/Artworks-utf8-small.csv'
+    booksfile = cf.data_dir + 'MoMA/Artworks-utf8-large.csv'
     input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
     for artwork in input_file:
         model.addArtwork(catalog, artwork) 
@@ -128,11 +128,6 @@ def artworksbyDepartment(catalog,department):
     """
     return model.artworksbyDepartment(catalog,department)
 
-def costoTotal(obras):
-    """
-    """
-    return model.costoTotal(obras)
-
 def pesoTotal(obras):
     """
     """
@@ -143,8 +138,7 @@ def masAntiguas(obras):
     """
     return model.masAntiguas(obras)
 
-
-def masCostosas(obras):
+def costoTotal_masCostosas(obras):
     """
     """
-    return model.masCostosas(obras)
+    return model.costoTotal_masCostosas(obras)

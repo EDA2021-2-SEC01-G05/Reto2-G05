@@ -77,7 +77,8 @@ def addArtist(catalog,artist):
 # Requerimiento 3
 def addArtworkbyArtist(catalog,artwork):
     """
-    Agregar las obras correspondientes a cada artista en el Map catalog['obbyArt']
+    Esta funcion adiciona una obra a la lista de obras de un artista especifico.
+    Los datos se guardan en un Map, donde la llave es el ID del artista y el valor la lista de obras de ese artista.
     """
     mapa = catalog['obbyArt']
     if artwork['ConstituentID'] != '':
@@ -138,7 +139,7 @@ def newDep(department):
     return entry
 
 #============================================================
-# Funciones basicas o complementarias
+# Funciones auxiliares
 #============================================================
 
 def getElementbyparameter(lista, parameter):
@@ -231,18 +232,16 @@ def compareDate(date,artwork):
     return -1
 
 def ordAscArtwDate(a,b):
-    fecha1 = a['Date']
-    fecha2 = b['Date']
-    if fecha1 != '' and fecha2 != '':
-        if int(fecha1) > int(fecha2):
+    if a['Date'] != '' and b['Date'] != '':
+        if int(a['Date']) > int(b['Date']):
             return 0
         else:
             return -1
-    elif fecha1 == '' and fecha2 == '':
+    elif a['Date'] == '' and b['Date'] == '':
         return 0
-    elif fecha1 == '' and fecha2 != '':
+    elif a['Date'] == '' and b['Date'] != '':
         return 0
-    elif fecha1 != '' and fecha2 == '':
+    elif a['Date'] != '' and b['Date'] == '':
         return -1
 
 def ordAscArtwCost(a,b):
@@ -251,7 +250,7 @@ def ordAscArtwCost(a,b):
     return -1
 
 #====================================================================
-# Funciones propias de los requerimientos
+# Funciones de los requerimientos
 #====================================================================
 
 #-----------------
@@ -412,16 +411,29 @@ def costoTransporte(obras):
         obra['Transcost (USD)'] = costo
     return obras
 
-def costoTotal(obras):
+def costoTotal_masCostosas(obras):
     """
-    Calcula el costo total de transportar unas obras.
+    Calcula el costo total de transportar unas obras, retorna este valor y una lista con las 5 obras mas costosas 
     """
     ob = costoTransporte(obras)
+    # Calcula el costo total
     t = 0
     for o in lt.iterator(ob):
         c = o['Transcost (USD)']
         t += float(c)
-    return int(t)
+    # hace la lista de las 5 obras mas costosas
+    ms.sort(ob,ordAscArtwCost)
+    costosas = lt.newList()
+    i = 0
+    while i < 5:
+        o = lt.removeLast(ob)
+        lt.addLast(costosas,o)
+        i += 1
+    # estipula el return
+    resultado = lt.newList()
+    lt.addFirst(resultado,int(t))
+    lt.addLast(resultado,costosas)
+    return resultado
 
 def pesoTotal(obras):
     """
@@ -447,17 +459,3 @@ def masAntiguas(obras):
         lt.addLast(antiguas,o)
         i += 1
     return antiguas
-
-def masCostosas(obras):
-    """
-    Retorna una lista con las 5 obras mas costosas de obras 
-    """
-    o = costoTransporte(obras)
-    ms.sort(o,ordAscArtwCost)
-    costosas = lt.newList()
-    i = 0
-    while i < 5:
-        ob = lt.removeLast(o)
-        lt.addLast(costosas,ob)
-        i += 1
-    return costosas
