@@ -87,6 +87,12 @@ def printArtworkData_Req3(artworks):
     size = lt.size(artworks)
     if size>0:
         for artwork in lt.iterator(artworks):
+
+            if artwork['Medium'] == "" or artwork['Medium'] is None:
+                artwork['Medium'] = "Ninguno"
+            if artwork['Dimensions'] == "":
+                artwork['Dimensions'] = "0"
+
             print ("ID: " + artwork["ObjectID"] + ", Título: " + artwork["Title"] 
                     + ", Fecha:  " + artwork["Date"] + ", Medio: " 
                     + artwork["Medium"] + ", Dimensiones: " + artwork["Dimensions"])
@@ -134,24 +140,31 @@ def requerimiento3(catalog,nombre):
     lista = controller.artworksbyMedium(artworks)
     medios = controller.contarMedios(artworks)
     medio_max = controller.medioMax(lista)
+    first = controller.firstThreeD(lista)
+    last = controller.lastThreeD(lista)
     print("-" * 50)
     print("Total de medios usados por el artista en sus obras: " + str(medios))
     print("-" * 50)
     print("La técnica más usada por el artista es: " + str(medio_max))
     print("-" * 50)
     print("Listado de obras con la técnica más usada: ")
-    printArtworkData_Req3(lista)
+    print("-" * 50)
+    print("Tres primeros: ")
+    printArtworkData_Req3(first)
+    print("-" * 50)
+    print("Tres ultimos: ")
+    printArtworkData_Req3(last)
 
 def requerimiento5(catalog,department):
-    obras = controller.artworksbyDepartment(catalog,department)
-    resultado = controller.costoTotal_masCostosas(obras)
-    total = lt.removeFirst(resultado)
-    costosas = lt.removeLast(resultado)
-    peso = controller.pesoTotal(obras)
-    antiguas = controller.masAntiguas(obras)
-    print('Total de obras para transportar: ' + str(lt.size(obras)))
+    dep = controller.artworksbyDepartment(catalog,department)
+    tamano = lt.removeFirst(dep)
+    costo = lt.removeFirst(dep)
+    peso = lt.removeLast(dep)
+    antiguas = controller.masAntiguas(catalog,department)
+    costosas = controller.masCostosas(catalog,department)
+    print('Total de obras para transportar: ' + str(tamano))
     print("-" * 50)
-    print('Costo total estimado de transportar las obras (USD): ' + str(total))
+    print('Costo total estimado de transportar las obras (USD): ' + str(costo))
     print("-" * 50)
     print('Peso total estimado de las obras (kg): ' + str(peso))
     print("-" * 50)

@@ -24,6 +24,7 @@
  * Dario Correal - Version inicial
  """
 
+from DISClib.DataStructures.arraylist import firstElement
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -41,7 +42,9 @@ def newCatalog(type):
     catalog = {'artworks': None,
                'artists': None,
                'obbyArt': None,
-               'departament': None}
+               'departament': None,
+               'depCosto': None,
+               'depAntiguas': None}
 
     """
     """
@@ -59,7 +62,16 @@ def newCatalog(type):
                                    maptype='CHAINING',
                                    loadfactor=4.0,
                                    comparefunction=compareDepartmentM)
-
+    # Map requerimiento 5
+    catalog['depCosto'] = mp.newMap(10000,
+                                   maptype='CHAINING',
+                                   loadfactor=4.0,
+                                   comparefunction=compareDepartmentM)
+    # Map requerimiento 5
+    catalog['depAntiguas'] = mp.newMap(10000,
+                                   maptype='CHAINING',
+                                   loadfactor=4.0,
+                                   comparefunction=compareDepartmentM)           
     return catalog
 
 #===========================================================
@@ -70,6 +82,8 @@ def addArtwork(catalog,artwork):
     lt.addLast(catalog["artworks"], artwork)
     addArtworkbyArtist(catalog,artwork)
     addArtworkbyDepartment(catalog,artwork)
+    addArtworkbyDepCosto(catalog,artwork)
+    addArtworkbyDepAntiguas(catalog,artwork)
 
 def addArtist(catalog,artist):
     lt.addLast(catalog["artists"], artist)
@@ -112,8 +126,15 @@ def newArtista(artista):
 def addArtworkbyDepartment(catalog,artwork):
     """
     Esta funcion adiciona una obra a la lista de obras de un departamento especifico.
-    Los datos se guardan en un Map, donde la llave es el departamento y el valor la lista de obras de ese departamento.
+    Los datos se guardan en un Map, donde la llave es el departamento y 
+    el valor la estructura de obras por departamento de newDep().
     """
+    obra = costoTransporte(artwork)
+    costo = obra['Transcost (USD)']
+    peso = obra['Weight (kg)']
+    if peso == '':
+        peso = 0
+    
     departments = catalog['department']
     if artwork['Department'] != '':
         department = artwork['Department']
@@ -126,17 +147,83 @@ def addArtworkbyDepartment(catalog,artwork):
         dep = me.getValue(entry)
     else:
         dep = newDep(department)
-        mp.put(departments, department, dep)
-    lt.addLast(dep['obras'], artwork)
+        mp.put(departments,department,dep)
+
+    dep['costo'] += float(costo)
+    dep['peso'] += float(peso)
+    lt.addLast(dep['obras'],obra)
 
 def newDep(department):
     """
-    Esta funcion crea la estructura de obras asociadas a un departamento.
+    Esta funcion crea la estructura de obras por departamento para el map catalog['department'].
+    """
+    entry = {'departamento': "", 'costo': "", 'peso': "", "obras": None}
+    entry['departamento'] = department
+    entry['costo'] = 0
+    entry['peso'] = 0
+    entry['obras'] = lt.newList()
+    return entry
+
+def addArtworkbyDepCosto(catalog,artwork):
+    """
+    Esta funcion adiciona las obras costosas a la lista de obras de un departamento especifico.
+    Los datos se guardan en un Map, donde la llave es el departamento y 
+    el valor la estructura de obras por departamento de newDepartment().
+    """
+    obra = costoTransporte(artwork)
+    costo = obra['Transcost (USD)']
+    if int(costo) >= 90:
+        departments = catalog['depCosto']
+        if artwork['Department'] != '':
+            department = artwork['Department']
+        else:
+            department = "Ninguno"
+
+        existdep = mp.contains(departments,department)
+        if existdep:
+            entry = mp.get(departments,department)
+            dep = me.getValue(entry)
+        else:
+            dep = newDepartment(department)
+            mp.put(departments,department,dep)
+
+        lt.addLast(dep['obras'],obra)
+
+def newDepartment(department):
+    """
+    Esta funcion crea la estructura de obras por departamento para el map catalog['depCosto'].
     """
     entry = {'departamento': "", "obras": None}
     entry['departamento'] = department
-    entry['obras'] = lt.newList('SINGLE_LINKED', compareDate)
+    entry['obras'] = lt.newList()
     return entry
+
+def addArtworkbyDepAntiguas(catalog,artwork):
+    """
+    Esta funcion adiciona las obras antiguas a la lista de obras de un departamento especifico.
+    Los datos se guardan en un Map, donde la llave es el departamento y 
+    el valor la estructura de obras por departamento de newDepartment().
+    """
+    obra = costoTransporte(artwork)
+    fecha = artwork['Date']
+    if fecha == '':
+        fecha = '2022'
+    if int(fecha) <= 1900:
+        departments = catalog['depAntiguas']
+        if artwork['Department'] != '':
+            department = artwork['Department']
+        else:
+            department = "Ninguno"
+
+        existdep = mp.contains(departments,department)
+        if existdep:
+            entry = mp.get(departments,department)
+            dep = me.getValue(entry)
+        else:
+            dep = newDepartment(department)
+            mp.put(departments,department,dep)
+
+        lt.addLast(dep['obras'],obra)
 
 #============================================================
 # Funciones auxiliares
@@ -209,6 +296,11 @@ def compareNames(nombre,artist):
 
 def compareMedium(medium, artwork):
     if (medium in artwork["Medium"]):
+        return 0
+    return -1
+
+def compareCID(CID, element):
+    if (CID in element['ConstituentID']):
         return 0
     return -1
 
@@ -304,10 +396,14 @@ def listaMedios(obras):
     Retorna lista con representantes unicos para cada medio que se usa en una lista de obras 
     """
     first = lt.firstElement(obras)
+    if first['Medium'] == '':
+        first['Medium'] = "Ninguno"
     medios = lt.newList("SINGLE_LINKED",cmpfunction=compareMedium)
     lt.addFirst(medios,first)        
     for obra in lt.iterator(obras):
         i = 0
+        if obra['Medium'] == '':
+            obra['Medium'] = "Ninguno"
         for medio in lt.iterator(medios):
             if (str(obra['Medium']) == str(medio['Medium'])):
                 i += 1
@@ -325,6 +421,8 @@ def artworksbyMedium(obras):
     for medio in lt.iterator(medios):
         i = 0
         for obra in lt.iterator(obras):
+            if obra['Medium'] == '':
+                obra['Medium'] = 'Ninguno'
             if (medio['Medium'] == obra['Medium']):
                 i += 1
         lt.addLast(numeros,i)
@@ -335,15 +433,20 @@ def artworksbyMedium(obras):
     for medio in lt.iterator(medios):
         i = 0
         for obra in lt.iterator(obras):
+            if obra['Medium'] == '':
+                obra['Medium'] = "Ninguno"
             if (medio['Medium'] == obra['Medium']):
                 i += 1
-        if i is num:
+        if i == num:
+            m = medio
             break
     # hacemos una lista (lista) con las obras que usan el medio hallado (medio)
     lista = lt.newList()
-    if medio is not None:
+    if m is not None:
         for obra in lt.iterator(obras):
-            if (obra['Medium'] ==  medio['Medium']):
+            if obra['Medium'] == '':
+                obra['Medium'] = "Ninguno"
+            if (obra['Medium'] ==  m['Medium']):
                 lt.addLast(lista,obra)
         return lista
 
@@ -361,96 +464,84 @@ def contarMedios(obras):
 
 def artworksbyDepartment(catalog,department):
     """
-    Retorna la lista de las obras en un departamento.
+    Dado un departamento retorna una lista con el total de sus obras, su costo total de transporte y su peso total.
     """
     dep = mp.get(catalog['department'],department)
     if dep:
+        costo = me.getValue(dep)['costo']
+        peso = me.getValue(dep)['peso']
         obras = me.getValue(dep)['obras']
-    return obras
+    resultado = lt.newList()
+    lt.addFirst(resultado,lt.size(obras))
+    lt.addLast(resultado,int(costo))
+    lt.addLast(resultado,int(peso))
+    return resultado
 
-def costoTransporte(obras):
+def costoTransporte(obra):
     """
-    Calcular el costo de transporte de cada obra en obras y agregar el dato al elemento correspondiente.
+    Calcula el costo de transporte de una obra y agrega el dato a la obra correspondiente.
     """
-    for obra in lt.iterator(obras):
-        # sacar los datos relevantes y estipular valores por defecto
-        peso = obra['Weight (kg)']
-        largo = obra['Length (cm)']
-        ancho = obra['Width (cm)']
-        profundidad = obra['Depth (cm)']
-        altura = obra['Height (cm)']
-        if peso is "":
-            peso = 0
-        else:
-            peso = float(peso)
-        if largo is "":
-            largo = 0
-        if ancho is "":
-            ancho = 0
-        if profundidad is "":
-            profundidad = 0
-        if altura is "":
-            altura = 0
-        # calcular el tamano (tres posibles formas)
-        t1 = (float(ancho)/100)*(float(altura)/100)
-        t2 = (float(ancho)/100)*(float(largo)/100)
-        t3 = (float(ancho)/100)*(float(altura)/100)*(float(profundidad)/100)
-        # crear lista para comparar los tamanos y sacar el mas grande
-        lista = lt.newList()
-        lt.addLast(lista,peso)
-        lt.addLast(lista,t3)
-        lt.addLast(lista,t2)
-        lt.addLast(lista,t1)
-        ms.sort(lista,cmpfunction=ordenAscendente)
-        tamano = lt.lastElement(lista)
-        # estipular el costo y agregarlo a los datos de la obra
-        if tamano == 0:
-            costo = 48
-        else:
-            costo = tamano*72
-        obra['Transcost (USD)'] = costo
-    return obras
+    # sacar los datos relevantes y estipular valores por defecto
+    peso = obra['Weight (kg)']
+    largo = obra['Length (cm)']
+    ancho = obra['Width (cm)']
+    profundidad = obra['Depth (cm)']
+    altura = obra['Height (cm)']
+    if peso is "":
+        peso = 0
+    else:
+        peso = float(peso)
+    if largo is "":
+        largo = 0
+    if ancho is "":
+        ancho = 0
+    if profundidad is "":
+        profundidad = 0
+    if altura is "":
+        altura = 0
+    # calcular el tamano (tres posibles formas)
+    t1 = (float(ancho)/100)*(float(altura)/100)
+    t2 = (float(ancho)/100)*(float(largo)/100)
+    t3 = (float(ancho)/100)*(float(altura)/100)*(float(profundidad)/100)
+    # crear lista para comparar los tamanos y sacar el mas grande
+    lista = lt.newList()
+    lt.addLast(lista,peso)
+    lt.addLast(lista,t3)
+    lt.addLast(lista,t2)
+    lt.addLast(lista,t1)
+    ms.sort(lista,cmpfunction=ordenAscendente)
+    tamano = lt.lastElement(lista)
+    # estipular el costo y agregarlo a los datos de la obra
+    if tamano == 0:
+        costo = 48
+    else:
+        costo = tamano*72
+    obra['Transcost (USD)'] = costo
+    return obra
 
-def costoTotal_masCostosas(obras):
+def masCostosas(catalog,department):
     """
-    Calcula el costo total de transportar unas obras, retorna este valor y una lista con las 5 obras mas costosas 
+    Retorna una lista con las 5 obras mas costosas de las obras del department.
     """
-    ob = costoTransporte(obras)
-    # Calcula el costo total
-    t = 0
-    for o in lt.iterator(ob):
-        c = o['Transcost (USD)']
-        t += float(c)
-    # hace la lista de las 5 obras mas costosas
-    ms.sort(ob,ordAscArtwCost)
+    dep = mp.get(catalog['depCosto'],department)
+    if dep:
+        obras = me.getValue(dep)['obras']
+    ms.sort(obras,ordAscArtwCost)
     costosas = lt.newList()
     i = 0
     while i < 5:
-        o = lt.removeLast(ob)
+        o = lt.removeLast(obras)
         lt.addLast(costosas,o)
         i += 1
-    # estipula el return
-    resultado = lt.newList()
-    lt.addFirst(resultado,int(t))
-    lt.addLast(resultado,costosas)
-    return resultado
+    return costosas
 
-def pesoTotal(obras):
+def masAntiguas(catalog,department):
     """
-    Calcula el peso total de las obras
+    Retorna una lista con las 5 obras mas antiguas de las obras del department. 
     """
-    w = 0
-    for obra in lt.iterator(obras):
-        peso = obra['Weight (kg)']
-        if peso is "":
-            peso = 0
-        w += float(peso)
-    return int(w)
-
-def masAntiguas(obras):
-    """
-    Retorna una lista con las 5 obras mas antiguas de obras 
-    """
+    dep = mp.get(catalog['depAntiguas'],department)
+    if dep:
+        obras = me.getValue(dep)['obras']
     ms.sort(obras,ordAscArtwDate)
     antiguas = lt.newList()
     i = 0
@@ -459,3 +550,5 @@ def masAntiguas(obras):
         lt.addLast(antiguas,o)
         i += 1
     return antiguas
+
+    

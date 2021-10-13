@@ -128,17 +128,12 @@ def artworksbyDepartment(catalog,department):
     """
     return model.artworksbyDepartment(catalog,department)
 
-def pesoTotal(obras):
+def masCostosas(catalog,department):
     """
     """
-    return model.pesoTotal(obras)
+    return model.masCostosas(catalog,department)
 
-def masAntiguas(obras):
+def masAntiguas(catalog,department):
     """
     """
-    return model.masAntiguas(obras)
-
-def costoTotal_masCostosas(obras):
-    """
-    """
-    return model.costoTotal_masCostosas(obras)
+    return model.masAntiguas(catalog,department)
