@@ -29,9 +29,9 @@ from DISClib.ADT import list as lt
 El controlador se encarga de mediar entre la vista y el modelo.
 
 """
-#======================================
+#=========================================================================
 # Inicialización del Catálogo de obras
-#======================================
+#=========================================================================
 
 def initCatalog():
     """
@@ -41,9 +41,9 @@ def initCatalog():
     catalog = model.newCatalog(t)
     return catalog
 
-#==================================
+#=========================================================================
 # Funciones para la carga de datos
-#==================================
+#=========================================================================
 
 def loadData(catalog):
     """
@@ -71,12 +71,12 @@ def loadArtworks(catalog):
     for artwork in input_file:
         model.addArtwork(catalog, artwork) 
 
-#=================
-# requerimientos
-#=================
+#=========================================================================
+# Funciones de los requerimientos
+#=========================================================================
 
 #-----------------
-# requerimiento 1
+# Requerimiento 1
 #-----------------
 
 def artistsbyAnio(catalog,anio_inicial,anio_final):
@@ -95,7 +95,7 @@ def lastThreeD(catalog):
     return model.lastThreeD(catalog)
 
 #-----------------
-# requerimiento 3
+# Requerimiento 3
 #-----------------
 
 def artworksbyArtist(catalog,nombre):
@@ -119,11 +119,32 @@ def medioMax(obras):
     medio = lt.firstElement(obras)
     return medio['Medium']
 
-#--------
-# lab 5
-#--------
+#------------------
+# Requerimiento 5
+#------------------
 
-def obrasAntiguas(catalog,n,medio):
+def artworksbyDepartment(catalog,department):
     """
     """
-    return model.obrasAntiguas(catalog,n,medio)
+    return model.artworksbyDepartment(catalog,department)
+
+def costoTotal(obras):
+    """
+    """
+    return model.costoTotal(obras)
+
+def pesoTotal(obras):
+    """
+    """
+    return model.pesoTotal(obras)
+
+def masAntiguas(obras):
+    """
+    """
+    return model.masAntiguas(obras)
+
+
+def masCostosas(obras):
+    """
+    """
+    return model.masCostosas(obras)

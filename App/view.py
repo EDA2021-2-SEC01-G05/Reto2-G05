@@ -32,16 +32,16 @@ Presenta el menu de opciones y por cada seleccion
 se hace la solicitud al controlador para ejecutar la
 operación solicitada
 """
-#=====================
-# funciones iniciales
-#=====================
+#========================================================================
+# Funciones iniciales
+#========================================================================
 
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- Listar cronologicamente los artistas")
     print("4- Clasificar las obras de los artistas por tecnica")
-    print("3- Ver las n obras mas antiguas para un medio especifico")
+    print("6- Calcular costo de transportar las obras de un departamento")
     print("0-  Salir")
     
 def initCatalog():
@@ -58,9 +58,9 @@ def loadData(catalog):
 
 catalog = None
 
-#===========================================
-# especificaciones de la impresion de datos
-#===========================================
+#========================================================================
+# Especificaciones de la impresion de datos
+#========================================================================
 
 def printArtworkData(artworks):
     size = lt.size(artworks)
@@ -93,13 +93,21 @@ def printArtworkData_Req3(artworks):
     else:
         print ("No se encontraron artistas")
 
-#=================
-# requerimientos
-#=================
+def printArtworkData_Req5(artworks):
+    size = lt.size(artworks)
+    if size>0:
+        for artwork in lt.iterator(artworks):
+            print ("ID: " + artwork["ObjectID"] + ", Título: " + artwork["Title"] 
+                    + ", ID artistas: " + artwork['ConstituentID'] + ", Clasificacion: " 
+                    + artwork['Classification'] + ", Fecha:  " + artwork["Date"] + ", Medio: " 
+                    + artwork["Medium"] + ", Dimensiones: " + artwork["Dimensions"] 
+                    + ", Costo de transporte (USD): " + str(int(artwork['Transcost (USD)'])))
+    else:
+        print ("No se encontraron artistas")
 
-def lab5(catalog,n,medio):
-    obras = controller.obrasAntiguas(catalog,n,medio)
-    printArtworkData(obras)
+#==========================================================================
+# Requerimientos
+#==========================================================================
 
 def requerimiento1(catalog, anio_inicial, anio_final):
     """
@@ -133,10 +141,30 @@ def requerimiento3(catalog,nombre):
     print("-" * 50)
     print("Listado de obras con la técnica más usada: ")
     printArtworkData_Req3(lista)
+
+def requerimiento5(catalog,department):
+    obras = controller.artworksbyDepartment(catalog,department)
+    total = controller.costoTotal(obras)
+    peso = controller.pesoTotal(obras)
+    antiguas = controller.masAntiguas(obras)
+    costosas = controller.masCostosas(obras)
+    print('Total de obras para transportar: ' + str(lt.size(obras)))
+    print("-" * 50)
+    print('Costo total estimado de transportar las obras (USD): ' + str(total))
+    print("-" * 50)
+    print('Peso total estimado de las obras (kg): ' + str(peso))
+    print("-" * 50)
+    print('Las 5 obras más antiguas a transportar son: ')
+    print("-" * 50)
+    printArtworkData_Req5(antiguas)
+    print("-" * 50)
+    print('Las 5 obras más costosas a transportar son: ')
+    print("-" * 50)
+    printArtworkData_Req5(costosas)
     
-#=================
+#====================================================================================
 # Menu principal
-#=================
+#====================================================================================
 
 while True:
     printMenu()
@@ -162,12 +190,6 @@ while True:
         elapsed_time_mseg = (stop_time - start_time)*1000
         print("Tiempo de ejecución: " + str(elapsed_time_mseg))
 
-    elif int(inputs[0]) == 3:
-        n = input("Ingrese el numero de obras que quiere ver: ")
-        medio = input("Ingrese el medio o tecnica: ")
-        lab5(catalog,n,medio)
-        
-
     elif int(inputs[0]) == 4:
         nombre = input("Ingrese el nombre del artista: ")
         start_time = time.process_time()
@@ -175,6 +197,14 @@ while True:
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print("Tiempo de ejecución: " + str(elapsed_time_mseg))
+
+    elif int(inputs[0]) == 6:
+        department = input("Ingrese el nombre del departamento del museo: ")
+        start_time = time.process_time()
+        requerimiento5(catalog,department)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print("Tiempo de ejecución: " + str(elapsed_time_mseg))    
 
     else:
         sys.exit(0)
