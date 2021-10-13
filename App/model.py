@@ -128,7 +128,7 @@ def newMedio(medio):
     """
     entry = {'medio': "", "obras": None}
     entry['medio'] = medio
-    entry['obras'] = lt.newList()
+    entry['obras'] = lt.newList(cmpfunction=compareDate)
     return entry
 
 def loadNationality(catalog):
@@ -247,6 +247,8 @@ def obrasAntiguas(catalog,n,medio):
         valor = me.getValue(medio)
     obras = valor["obras"]
     for obra in lt.iterator(obras):
+        if obra['Date'] == '':
+            obra['Date'] = '2022'
         lt.addLast(fechas,int(obra['Date']))
     sa.sort(fechas,ordenAscendente)
     i = 0
