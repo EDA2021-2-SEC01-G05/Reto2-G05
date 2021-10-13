@@ -24,11 +24,13 @@
  * Dario Correal - Version inicial
  """
 
+from DISClib.DataStructures.arraylist import iterator
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from datetime import date, timedelta
 assert cf
 
 #=========================
@@ -50,8 +52,16 @@ def newCatalog(type):
                                     cmpfunction=compareCID)
     catalog['medium'] = mp.newMap(10000,
                                    maptype='CHAINING',
-                                   loadfactor=4.0,
+                                   loadfactor=2.00,
                                    comparefunction=compareMedio)
+    catalog["nationality"] = mp.newMap(1000,
+                                        maptype="PROBING",
+                                        loadfactor=0.8,
+                                        comparefunction=compareNacionalidad)
+    catalog["artists_ID"] = mp.newMap(15223,
+                                        maptype="PROBING",
+                                        loadfactor=0.2)
+
     return catalog
 
 #==========================
@@ -59,8 +69,39 @@ def newCatalog(type):
 #==========================
 
 def addArtwork(catalog,artwork):
+    if artwork["DateAcquired"] == "" or artwork["DateAcquired"] == "Unknown":
+        hoy = date.today()
+        artwork["DateAcquired"] = hoy.strftime("%Y-%m-%d")
+    if artwork["Date"] == "" or artwork["Date"] == "Unknown":
+        hoy = date.today()
+        artwork["DateAcquired"] = hoy.strftime("%Y-%m-%d")
     lt.addLast(catalog["artworks"], artwork)
     addArtworkMedium(catalog,artwork)
+
+def addArtist(catalog,artist):
+    lt.addLast(catalog["artists"], artist)
+    info = newArtist(artist)
+    mp.put(catalog["artists_ID"], artist["ConstituentID"], info)
+
+def newArtist(artist):
+    """"""
+    artista = {"Nombre": "",
+            "Bio": "",
+            "Nacionalidad": "",
+            "Genero": "",
+            "Nacimiento": "",
+            "Muerte": "",
+            "Wiki": "",
+            "ULAN": ""}
+    artista["Nombre"] = artist["DisplayName"]
+    artista["Bio"] = artist["ArtistBio"]
+    artista["Nacionalidad"] = artist["Nationality"]
+    artista["Genero"] = artist["Gender"]
+    artista["Nacimiento"] = artist["BeginDate"]
+    artista["Muerte"] = artist["EndDate"]
+    artista["Wiki"] = artist["Wiki QID"]
+    artista["ULAN"] = artist["ULAN"]
+    return artista
 
 def addArtworkMedium(catalog,artwork):
     """
@@ -87,11 +128,34 @@ def newMedio(medio):
     """
     entry = {'medio': "", "obras": None}
     entry['medio'] = medio
-    entry['obras'] = lt.newList('SINGLE_LINKED', compareDate)
+    entry['obras'] = lt.newList()
     return entry
 
-def addArtist(catalog,artist):
-    lt.addLast(catalog["artists"], artist)
+def loadNationality(catalog):
+    """
+    Esta funcion adiciona un artista a la lista de obras que usan un medio especifico.
+    Los medios se guardan en un Map, donde la llave es el medio y el valor la lista de obras de ese medio.
+    """
+    for obra in lt.iterator(catalog["artworks"]):
+        codes = obra["ConstituentID"]
+        nacionalidades = getArtworksNationality(catalog, codes)
+        for nacionalidad in lt.iterator(nacionalidades):
+            if nacionalidad == " " or nacionalidad == "":
+                nacionalidad = "Nationality unknown"
+            existnation = mp.contains(catalog["nationality"], nacionalidad)
+            if existnation:
+                entry = mp.get(catalog["nationality"], nacionalidad)
+                nac = me.getValue(entry)
+            else:
+                nac = newNation(nacionalidad)
+                mp.put(catalog["nationality"], nacionalidad, nac)
+            lt.addLast(nac["obras"], obra)
+
+def newNation(nacionalidad):
+    entry = {'nacionalidad': "", "obras": None}
+    entry['nacionalidad'] = nacionalidad
+    entry["obras"] = lt.newList('SINGLE_LINKED')
+    return entry
 
 #=================================
 # consultar info, modificar datos
@@ -108,6 +172,21 @@ def getElementbyparameterE(lista, parameter):
         return element
     else:
         return None
+
+def getArtworksNationality(catalog, codes):
+    """
+    """
+    nations = lt.newList()
+    cIDS = codes.replace("[", "").replace("]", "").split(",")
+    for cID in cIDS:
+        cID = cID.strip()
+        existnation = mp.contains(catalog["artists_ID"], cID)
+        if existnation:
+            pareja = mp.get(catalog["artists_ID"], cID)
+            nacionalidad = me.getValue(pareja)
+            n = nacionalidad["Nacionalidad"]
+        lt.addLast(nations, n)
+    return nations
 
 #==========================
 # funciones de comparacion
@@ -144,6 +223,15 @@ def compareDate(date,artwork):
         return 0
     return -1
 
+def compareNacionalidad(nacionalidad, nacentry):
+    nacentry = me.getKey(nacentry)
+    if (str(nacentry) == str(nacionalidad)):
+        return 0
+    elif (str(nacentry) < str(nacionalidad)):
+        return 1
+    else:
+        return -1
+
 #================
 # requerimientos
 #================
@@ -155,8 +243,9 @@ def obrasAntiguas(catalog,n,medio):
     antiguas = lt.newList('SINGLE_LINKED',compareDate)
     fechas = lt.newList()
     medio = mp.get(catalog['medium'], medio)
-    if medio: 
-        obras = me.getValue(medio)['obras']
+    if medio:
+        valor = me.getValue(medio)
+    obras = valor["obras"]
     for obra in lt.iterator(obras):
         lt.addLast(fechas,int(obra['Date']))
     sa.sort(fechas,ordenAscendente)
