@@ -21,7 +21,7 @@
  *
  * Contribuciones:
  *
- * Dario Correal - Version inicial
+ * Dario Correal - Version inicialhdihfirh
  """
 
 from DISClib.DataStructures.arraylist import iterator
