@@ -56,22 +56,22 @@ def newCatalog(type):
     catalog['obbyArt'] = mp.newMap(10000,
                                    maptype='CHAINING',
                                    loadfactor=4.0,
-                                   comparefunction=compareArtist)
+                                   comparefunction=compareArtistD)
     # Map requerimiento 5
     catalog['department'] = mp.newMap(10000,
                                    maptype='CHAINING',
                                    loadfactor=4.0,
-                                   comparefunction=compareDepartmentM)
+                                   comparefunction=compareDepartmentD)
     # Map requerimiento 5
     catalog['depCosto'] = mp.newMap(10000,
                                    maptype='CHAINING',
                                    loadfactor=4.0,
-                                   comparefunction=compareDepartmentM)
+                                   comparefunction=compareDepartmentD)
     # Map requerimiento 5
     catalog['depAntiguas'] = mp.newMap(10000,
                                    maptype='CHAINING',
                                    loadfactor=4.0,
-                                   comparefunction=compareDepartmentM)           
+                                   comparefunction=compareDepartmentD)           
     return catalog
 
 #===========================================================
@@ -80,16 +80,16 @@ def newCatalog(type):
 
 def addArtwork(catalog,artwork):
     lt.addLast(catalog["artworks"], artwork)
-    addArtworkbyArtist(catalog,artwork)
-    addArtworkbyDepartment(catalog,artwork)
-    addArtworkbyDepCosto(catalog,artwork)
-    addArtworkbyDepAntiguas(catalog,artwork)
+    addArtworkbyArtistD(catalog,artwork)
+    addArtworkbyDepartmentD(catalog,artwork)
+    addArtworkbyDepCostoD(catalog,artwork)
+    addArtworkbyDepAntiguasD(catalog,artwork)
 
 def addArtist(catalog,artist):
     lt.addLast(catalog["artists"], artist)
 
 # Requerimiento 3
-def addArtworkbyArtist(catalog,artwork):
+def addArtworkbyArtistD(catalog,artwork):
     """
     Esta funcion adiciona una obra a la lista de obras de un artista especifico.
     Los datos se guardan en un Map, donde la llave es el ID del artista y el valor la lista de obras de ese artista.
@@ -109,27 +109,27 @@ def addArtworkbyArtist(catalog,artwork):
             entry = mp.get(mapa,artista)
             artist = me.getValue(entry)
         else:
-            artist = newArtista(artista)
+            artist = newArtistaD(artista)
             mp.put(mapa, artista, artist)
         lt.addLast(artist['obras'], artwork)
 
-def newArtista(artista):
+def newArtistaD(artista):
     """
     Esta funcion crea la estructura de obras asociadas a un artista.
     """
     entry = {'artista': "", "obras": None}
     entry['artista'] = artista
-    entry['obras'] = lt.newList('SINGLE_LINKED', compareDate)
+    entry['obras'] = lt.newList()
     return entry
 
 # Requerimiento 5
-def addArtworkbyDepartment(catalog,artwork):
+def addArtworkbyDepartmentD(catalog,artwork):
     """
     Esta funcion adiciona una obra a la lista de obras de un departamento especifico.
     Los datos se guardan en un Map, donde la llave es el departamento y 
     el valor la estructura de obras por departamento de newDep().
     """
-    obra = costoTransporte(artwork)
+    obra = costoTransporteD(artwork)
     costo = obra['Transcost (USD)']
     peso = obra['Weight (kg)']
     if peso == '':
@@ -146,14 +146,14 @@ def addArtworkbyDepartment(catalog,artwork):
         entry = mp.get(departments,department)
         dep = me.getValue(entry)
     else:
-        dep = newDep(department)
+        dep = newDepD(department)
         mp.put(departments,department,dep)
 
     dep['costo'] += float(costo)
     dep['peso'] += float(peso)
     lt.addLast(dep['obras'],obra)
 
-def newDep(department):
+def newDepD(department):
     """
     Esta funcion crea la estructura de obras por departamento para el map catalog['department'].
     """
@@ -164,13 +164,13 @@ def newDep(department):
     entry['obras'] = lt.newList()
     return entry
 
-def addArtworkbyDepCosto(catalog,artwork):
+def addArtworkbyDepCostoD(catalog,artwork):
     """
     Esta funcion adiciona las obras costosas a la lista de obras de un departamento especifico.
     Los datos se guardan en un Map, donde la llave es el departamento y 
     el valor la estructura de obras por departamento de newDepartment().
     """
-    obra = costoTransporte(artwork)
+    obra = costoTransporteD(artwork)
     costo = obra['Transcost (USD)']
     if int(costo) >= 90:
         departments = catalog['depCosto']
@@ -184,12 +184,12 @@ def addArtworkbyDepCosto(catalog,artwork):
             entry = mp.get(departments,department)
             dep = me.getValue(entry)
         else:
-            dep = newDepartment(department)
+            dep = newDepartmentD(department)
             mp.put(departments,department,dep)
 
         lt.addLast(dep['obras'],obra)
 
-def newDepartment(department):
+def newDepartmentD(department):
     """
     Esta funcion crea la estructura de obras por departamento para el map catalog['depCosto'].
     """
@@ -198,13 +198,13 @@ def newDepartment(department):
     entry['obras'] = lt.newList()
     return entry
 
-def addArtworkbyDepAntiguas(catalog,artwork):
+def addArtworkbyDepAntiguasD(catalog,artwork):
     """
     Esta funcion adiciona las obras antiguas a la lista de obras de un departamento especifico.
     Los datos se guardan en un Map, donde la llave es el departamento y 
     el valor la estructura de obras por departamento de newDepartment().
     """
-    obra = costoTransporte(artwork)
+    obra = costoTransporteD(artwork)
     fecha = artwork['Date']
     if fecha == '':
         fecha = '2022'
@@ -220,7 +220,7 @@ def addArtworkbyDepAntiguas(catalog,artwork):
             entry = mp.get(departments,department)
             dep = me.getValue(entry)
         else:
-            dep = newDepartment(department)
+            dep = newDepartmentD(department)
             mp.put(departments,department,dep)
 
         lt.addLast(dep['obras'],obra)
@@ -229,7 +229,7 @@ def addArtworkbyDepAntiguas(catalog,artwork):
 # Funciones auxiliares
 #============================================================
 
-def getElementbyparameter(lista, parameter):
+def getElementbyparameterD(lista, parameter):
     """
     Retorna un elemento de una lista dado un parametro, no lo elimina de la lista
     """
@@ -240,7 +240,7 @@ def getElementbyparameter(lista, parameter):
     else:
         return None
 
-def getElementbyparameterE(lista, parameter):
+def getElementbyparameterED(lista, parameter):
     """
     Retorna un elemento de una lista dado un parametro, luego, lo elimina de la lista
     """
@@ -252,7 +252,7 @@ def getElementbyparameterE(lista, parameter):
     else:
         return None
 
-def copiarLista(lista, cmpf):
+def copiarListaD(lista, cmpf):
     """
     Copia una lista con nueva cmpfunction cmpf
     """
@@ -266,64 +266,52 @@ def copiarLista(lista, cmpf):
 #======================================================
 
 # Se usan en varios requerimientos
-def ordenAscendente(a,b):
+def ordenAscendenteD(a,b):
     if (a > b):
         return 0
     return -1
 
 # Se usan en requerimiento 1
-def compareAnio(anio, artist):
+def compareAnioD(anio, artist):
     if anio in artist["BeginDate"]:
         return 0
     return -1
 
-def ordAscArtiAnio(a,b):
+def ordAscArtiAnioD(a,b):
     if int(a['BeginDate']) > int(b['BeginDate']):
         return 0
     return -1
 
 # Se usan en requerimiento 3
-def compareArtist(artist,artentry):
+def compareArtistD(artist,artentry):
     artentry = me.getKey(artentry)
     if (str(artentry) == str(artist)):
         return 0
     return -1
 
-def compareNames(nombre,artist):
+def compareNamesD(nombre,artist):
     if nombre in artist["DisplayName"]:
         return 0
     return -1
 
-def compareMedium(medium, artwork):
+def compareMediumD(medium, artwork):
     if (medium in artwork["Medium"]):
         return 0
     return -1
 
-def compareCID(CID, element):
+def compareCIDD(CID, element):
     if (CID in element['ConstituentID']):
         return 0
     return -1
 
 # Se usan en requerimiento 5
-def compareDepartmentM(departament, depentry):
+def compareDepartmentD(departament, depentry):
     depentry = me.getKey(depentry)
     if (str(depentry) == str(departament)):
         return 0
     return -1
 
-def compareDepartment(department, artwork):
-    if department in artwork['Department']:
-        return 0
-    return -1
-
-def compareDate(date,artwork):
-    if date in artwork['Date']:
-        return 0
-    if date == '':
-        return -1
-    return -1
-
-def ordAscArtwDate(a,b):
+def ordAscArtwDateD(a,b):
     if a['Date'] != '' and b['Date'] != '':
         if int(a['Date']) > int(b['Date']):
             return 0
@@ -336,7 +324,7 @@ def ordAscArtwDate(a,b):
     elif a['Date'] != '' and b['Date'] == '':
         return -1
 
-def ordAscArtwCost(a,b):
+def ordAscArtwCostD(a,b):
     if (a['Transcost (USD)'] > b['Transcost (USD)']):
         return 0
     return -1
@@ -349,12 +337,12 @@ def ordAscArtwCost(a,b):
 # Requerimiento 1
 #-----------------
 
-def artistsbyAnio(catalog,anio_inicial,anio_final):
+def artistsbyAnioD(catalog,anio_inicial,anio_final):
     """
     Organiza y retorna los artistas que esten en un rango de una fecha inicial y final.
     """
-    artistas = copiarLista(catalog['artists'],compareAnio)
-    ms.sort(artistas,ordAscArtiAnio)
+    artistas = copiarListaD(catalog['artists'],compareAnioD)
+    ms.sort(artistas,ordAscArtiAnioD)
     pos = lt.isPresent(artistas,str(anio_inicial))
     pos_f = lt.isPresent(artistas,str(anio_final))
     l = int(pos_f)-int(pos)
@@ -379,26 +367,26 @@ def lastThreeD(lista):
 # Requerimiento 3
 #------------------
 
-def artworksbyArtist(catalog,nombre):
+def artworksbyArtistD(catalog,nombre):
     """
     Retorna una lt con las obras de un artista por su nombre.
     """
-    copia = copiarLista(catalog['artists'],compareNames)
-    artista = getElementbyparameter(copia,nombre)
+    copia = copiarListaD(catalog['artists'],compareNamesD)
+    artista = getElementbyparameterD(copia,nombre)
     ide = artista['ConstituentID']
     artist = mp.get(catalog['obbyArt'], ide)
     if artist:
         obras = me.getValue(artist)['obras']
     return obras
 
-def listaMedios(obras):
+def listaMediosD(obras):
     """
     Retorna lista con representantes unicos para cada medio que se usa en una lista de obras 
     """
     first = lt.firstElement(obras)
     if first['Medium'] == '':
         first['Medium'] = "Ninguno"
-    medios = lt.newList("SINGLE_LINKED",cmpfunction=compareMedium)
+    medios = lt.newList("SINGLE_LINKED",cmpfunction=compareMediumD)
     lt.addFirst(medios,first)        
     for obra in lt.iterator(obras):
         i = 0
@@ -411,12 +399,12 @@ def listaMedios(obras):
             lt.addLast(medios,obra)
     return medios
     
-def artworksbyMedium(obras):
+def artworksbyMediumD(obras):
     """
     Retorna un lt con las obras que usan la tecnica o medio mas recurrente en obras.
     """
     # contamos numero de veces que aparece cada medio y agregamos este numero a una lista (numeros)
-    medios = listaMedios(obras)
+    medios = listaMediosD(obras)
     numeros = lt.newList()
     for medio in lt.iterator(medios):
         i = 0
@@ -427,7 +415,7 @@ def artworksbyMedium(obras):
                 i += 1
         lt.addLast(numeros,i)
     # ordenamos la lista y sacamos el numero mas grande
-    ms.sort(numeros,cmpfunction=ordenAscendente)
+    ms.sort(numeros,cmpfunction=ordenAscendenteD)
     num = lt.lastElement(numeros)
     # hallamos el medio (medio) correspondiente a este numero mas grande (num)
     for medio in lt.iterator(medios):
@@ -450,11 +438,11 @@ def artworksbyMedium(obras):
                 lt.addLast(lista,obra)
         return lista
 
-def contarMedios(obras):
+def contarMediosD(obras):
     """
     Cuenta la cantidad de medios que se usan en una lista de obras
     """
-    medios = listaMedios(obras)
+    medios = listaMediosD(obras)
     num = lt.size(medios)
     return num 
 
@@ -462,7 +450,7 @@ def contarMedios(obras):
 # Requerimiento 5
 #------------------
 
-def artworksbyDepartment(catalog,department):
+def artworksbyDepartmentD(catalog,department):
     """
     Dado un departamento retorna una lista con el total de sus obras, su costo total de transporte y su peso total.
     """
@@ -477,7 +465,7 @@ def artworksbyDepartment(catalog,department):
     lt.addLast(resultado,int(peso))
     return resultado
 
-def costoTransporte(obra):
+def costoTransporteD(obra):
     """
     Calcula el costo de transporte de una obra y agrega el dato a la obra correspondiente.
     """
@@ -509,7 +497,7 @@ def costoTransporte(obra):
     lt.addLast(lista,t3)
     lt.addLast(lista,t2)
     lt.addLast(lista,t1)
-    ms.sort(lista,cmpfunction=ordenAscendente)
+    ms.sort(lista,cmpfunction=ordenAscendenteD)
     tamano = lt.lastElement(lista)
     # estipular el costo y agregarlo a los datos de la obra
     if tamano == 0:
@@ -519,14 +507,14 @@ def costoTransporte(obra):
     obra['Transcost (USD)'] = costo
     return obra
 
-def masCostosas(catalog,department):
+def masCostosasD(catalog,department):
     """
     Retorna una lista con las 5 obras mas costosas de las obras del department.
     """
     dep = mp.get(catalog['depCosto'],department)
     if dep:
         obras = me.getValue(dep)['obras']
-    ms.sort(obras,ordAscArtwCost)
+    ms.sort(obras,ordAscArtwCostD)
     costosas = lt.newList()
     i = 0
     while i < 5:
@@ -535,14 +523,14 @@ def masCostosas(catalog,department):
         i += 1
     return costosas
 
-def masAntiguas(catalog,department):
+def masAntiguasD(catalog,department):
     """
     Retorna una lista con las 5 obras mas antiguas de las obras del department. 
     """
     dep = mp.get(catalog['depAntiguas'],department)
     if dep:
         obras = me.getValue(dep)['obras']
-    ms.sort(obras,ordAscArtwDate)
+    ms.sort(obras,ordAscArtwDateD)
     antiguas = lt.newList()
     i = 0
     while i < 5:
@@ -550,5 +538,3 @@ def masAntiguas(catalog,department):
         lt.addLast(antiguas,o)
         i += 1
     return antiguas
-
-    

@@ -62,17 +62,6 @@ catalog = None
 # Especificaciones de la impresion de datos
 #========================================================================
 
-def printArtworkData(artworks):
-    size = lt.size(artworks)
-    if size>0:
-        for artwork in lt.iterator(artworks):
-            if artwork is not None:
-                print ("ID: " + artwork["ObjectID"] + ", Título: " + artwork["Title"] 
-                    + ", Fecha:  " + artwork["Date"] + ", Medio: " 
-                    + artwork["Medium"])
-    else:
-        print ("No se encontraron obras")
-
 def printArtistData_Req1(artists):
     size = lt.size(artists)
     if size>0:
@@ -120,7 +109,7 @@ def requerimiento1(catalog, anio_inicial, anio_final):
     Genera una lista cronológicamente ordenada de los artistas en un rango de anios.
     Retorna el total de artistas en el rango cronológico, y los primeros 3 y ultimos 3 artistas del rango.
     """
-    org_anio = controller.artistsbyAnio(catalog, anio_inicial, anio_final)
+    org_anio = controller.artistsbyAnioD(catalog, anio_inicial, anio_final)
     print("\n")
     print("Total de artistas en el rango " + str(anio_inicial) + " - " + str(anio_final) + ": " + str(lt.size(org_anio)))
     print("-" * 50)
@@ -134,12 +123,12 @@ def requerimiento1(catalog, anio_inicial, anio_final):
     print("-" * 50)
 
 def requerimiento3(catalog,nombre):
-    artworks = controller.artworksbyArtist(catalog,nombre)
+    artworks = controller.artworksbyArtistD(catalog,nombre)
     print("\n")
     print("Total de obras del artista " + str(nombre) + ": " + str(lt.size(artworks)))
-    lista = controller.artworksbyMedium(artworks)
-    medios = controller.contarMedios(artworks)
-    medio_max = controller.medioMax(lista)
+    lista = controller.artworksbyMediumD(artworks)
+    medios = controller.contarMediosD(artworks)
+    medio_max = controller.medioMaxD(lista)
     first = controller.firstThreeD(lista)
     last = controller.lastThreeD(lista)
     print("-" * 50)
@@ -156,12 +145,12 @@ def requerimiento3(catalog,nombre):
     printArtworkData_Req3(last)
 
 def requerimiento5(catalog,department):
-    dep = controller.artworksbyDepartment(catalog,department)
+    dep = controller.artworksbyDepartmentD(catalog,department)
     tamano = lt.removeFirst(dep)
     costo = lt.removeFirst(dep)
     peso = lt.removeLast(dep)
-    antiguas = controller.masAntiguas(catalog,department)
-    costosas = controller.masCostosas(catalog,department)
+    antiguas = controller.masAntiguasD(catalog,department)
+    costosas = controller.masCostosasD(catalog,department)
     print('Total de obras para transportar: ' + str(tamano))
     print("-" * 50)
     print('Costo total estimado de transportar las obras (USD): ' + str(costo))

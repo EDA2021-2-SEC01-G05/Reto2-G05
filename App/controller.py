@@ -37,7 +37,7 @@ def initCatalog():
     """
     Llama la funcion de inicializacion del catalogo del modelo.
     """
-    t = "SINGLE_LINKED"
+    t = "ARRAY_LIST"
     catalog = model.newCatalog(t)
     return catalog
 
@@ -79,10 +79,10 @@ def loadArtworks(catalog):
 # Requerimiento 1
 #-----------------
 
-def artistsbyAnio(catalog,anio_inicial,anio_final):
+def artistsbyAnioD(catalog,anio_inicial,anio_final):
     """
     """
-    return model.artistsbyAnio(catalog,anio_inicial,anio_final)
+    return model.artistsbyAnioD(catalog,anio_inicial,anio_final)
 
 def firstThreeD(catalog):
     """
@@ -98,22 +98,22 @@ def lastThreeD(catalog):
 # Requerimiento 3
 #-----------------
 
-def artworksbyArtist(catalog,nombre):
+def artworksbyArtistD(catalog,nombre):
     """
     """
-    return model.artworksbyArtist(catalog,nombre)
+    return model.artworksbyArtistD(catalog,nombre)
 
-def artworksbyMedium(obras):
+def artworksbyMediumD(obras):
     """
     """
-    return model.artworksbyMedium(obras)
+    return model.artworksbyMediumD(obras)
 
-def contarMedios(obras):
+def contarMediosD(obras):
     """
     """
-    return model.contarMedios(obras)
+    return model.contarMediosD(obras)
 
-def medioMax(obras):
+def medioMaxD(obras):
     """
     """
     medio = lt.firstElement(obras)
@@ -123,17 +123,17 @@ def medioMax(obras):
 # Requerimiento 5
 #------------------
 
-def artworksbyDepartment(catalog,department):
+def artworksbyDepartmentD(catalog,department):
     """
     """
-    return model.artworksbyDepartment(catalog,department)
+    return model.artworksbyDepartmentD(catalog,department)
 
-def masCostosas(catalog,department):
+def masCostosasD(catalog,department):
     """
     """
-    return model.masCostosas(catalog,department)
+    return model.masCostosasD(catalog,department)
 
-def masAntiguas(catalog,department):
+def masAntiguasD(catalog,department):
     """
     """
-    return model.masAntiguas(catalog,department)
+    return model.masAntiguasD(catalog,department)
