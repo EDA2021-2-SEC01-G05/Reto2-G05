@@ -195,7 +195,7 @@ def newDepartmentD(department):
     """
     entry = {'departamento': "", "obras": None}
     entry['departamento'] = department
-    entry['obras'] = lt.newList()
+    entry['obras'] = lt.newList("ARRAY_LIST")
     return entry
 
 def addArtworkbyDepAntiguasD(catalog,artwork):
@@ -220,10 +220,19 @@ def addArtworkbyDepAntiguasD(catalog,artwork):
             entry = mp.get(departments,department)
             dep = me.getValue(entry)
         else:
-            dep = newDepartmentD(department)
+            dep = newDepartmentAD(department)
             mp.put(departments,department,dep)
 
         lt.addLast(dep['obras'],obra)
+
+def newDepartmentAD(department):
+    """
+    Esta funcion crea la estructura de obras por departamento para el map catalog['depCosto'].
+    """
+    entry = {'departamento': "", "obras": None}
+    entry['departamento'] = department
+    entry['obras'] = lt.newList("SINGLE_LINKED")
+    return entry
 
 #============================================================
 # Funciones auxiliares
@@ -386,8 +395,8 @@ def listaMediosD(obras):
     first = lt.firstElement(obras)
     if first['Medium'] == '':
         first['Medium'] = "Ninguno"
-    medios = lt.newList("SINGLE_LINKED",cmpfunction=compareMediumD)
-    lt.addFirst(medios,first)        
+    medios = lt.newList("ARRAY_LIST",cmpfunction=compareMediumD)
+    lt.addLast(medios,first)        
     for obra in lt.iterator(obras):
         i = 0
         if obra['Medium'] == '':
@@ -405,7 +414,7 @@ def artworksbyMediumD(obras):
     """
     # contamos numero de veces que aparece cada medio y agregamos este numero a una lista (numeros)
     medios = listaMediosD(obras)
-    numeros = lt.newList()
+    numeros = lt.newList("ARRAY_LIST")
     for medio in lt.iterator(medios):
         i = 0
         for obra in lt.iterator(obras):
@@ -429,7 +438,7 @@ def artworksbyMediumD(obras):
             m = medio
             break
     # hacemos una lista (lista) con las obras que usan el medio hallado (medio)
-    lista = lt.newList()
+    lista = lt.newList("ARRAY_LIST")
     if m is not None:
         for obra in lt.iterator(obras):
             if obra['Medium'] == '':
@@ -459,8 +468,8 @@ def artworksbyDepartmentD(catalog,department):
         costo = me.getValue(dep)['costo']
         peso = me.getValue(dep)['peso']
         obras = me.getValue(dep)['obras']
-    resultado = lt.newList()
-    lt.addFirst(resultado,lt.size(obras))
+    resultado = lt.newList("ARRAY_LIST")
+    lt.addLast(resultado,lt.size(obras))
     lt.addLast(resultado,int(costo))
     lt.addLast(resultado,int(peso))
     return resultado

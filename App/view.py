@@ -146,9 +146,9 @@ def requerimiento3(catalog,nombre):
 
 def requerimiento5(catalog,department):
     dep = controller.artworksbyDepartmentD(catalog,department)
-    tamano = lt.removeFirst(dep)
-    costo = lt.removeFirst(dep)
     peso = lt.removeLast(dep)
+    costo = lt.removeLast(dep)
+    tamano = lt.removeLast(dep)
     antiguas = controller.masAntiguasD(catalog,department)
     costosas = controller.masCostosasD(catalog,department)
     print('Total de obras para transportar: ' + str(tamano))
