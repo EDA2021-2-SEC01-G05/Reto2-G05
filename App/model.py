@@ -30,6 +30,7 @@ from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import mergesort as ms
 from datetime import date, timedelta
 assert cf
 
@@ -61,7 +62,10 @@ def newCatalog(type):
     catalog["artists_ID"] = mp.newMap(15223,
                                         maptype="PROBING",
                                         loadfactor=0.2)
-
+    catalog["dates_artworks"] =mp.newMap(10000, 
+                                            maptype="PROBING",
+                                            loadfactor=0.2, 
+                                            comparefunction=compareFecha)
     return catalog
 
 #==========================
@@ -77,6 +81,7 @@ def addArtwork(catalog,artwork):
         artwork["DateAcquired"] = hoy.strftime("%Y-%m-%d")
     lt.addLast(catalog["artworks"], artwork)
     addArtworkMedium(catalog,artwork)
+    addDate_Artworks(catalog, artwork)
 
 def addArtist(catalog,artist):
     lt.addLast(catalog["artists"], artist)
@@ -157,6 +162,26 @@ def newNation(nacionalidad):
     entry["obras"] = lt.newList('SINGLE_LINKED')
     return entry
 
+def addDate_Artworks(catalog, artwork):
+    """
+    """
+    fechas = catalog['dates_artworks']
+    fecha = artwork["DateAcquired"]
+    existfecha = mp.contains(fechas,fecha)
+    if existfecha:
+        entry = mp.get(fechas,fecha)
+        date = me.getValue(entry)
+    else:
+        date = newDate(fecha)
+        mp.put(fechas, fecha, date)
+    lt.addLast(date['obras'], artwork)
+
+def newDate(fecha):
+    entry = {'fecha': "", "obras": None}
+    entry['fecha'] = fecha
+    entry["obras"] = lt.newList('SINGLE_LINKED')
+    return entry
+
 #=================================
 # consultar info, modificar datos
 #=================================
@@ -187,6 +212,47 @@ def getArtworksNationality(catalog, codes):
             n = nacionalidad["Nacionalidad"]
         lt.addLast(nations, n)
     return nations
+
+def getArtworksartists(catalog, codes):
+    """
+    """
+    artistas = ""
+    cIDS = codes.replace("[", "").replace("]", "").split(",")
+    for cID in cIDS:
+        cID = cID.strip()
+        existnation = mp.contains(catalog["artists_ID"], cID)
+        if existnation:
+            pareja = mp.get(catalog["artists_ID"], cID)
+            valor = me.getValue(pareja)
+            nombre = valor["Nombre"]
+        artistas += nombre + " "
+    return artistas
+
+def getArtworksbyDate(catalog, date, org):
+    """
+    """
+    fechas = catalog["dates_artworks"]
+    existdate = mp.contains(fechas, date)
+    if existdate:
+        pareja = mp.get(fechas, date)
+        valor = me.getValue(pareja)
+        obras = valor["obras"]
+        for obra in lt.iterator(obras):
+            lt.addLast(org, obra)
+
+def firstThreeD(lista):
+    """
+    Retorna una lista con los tres primeros elementos de una lista.
+    """
+    first = lt.subList(lista,1,3)
+    return first
+    
+def lastThreeD(lista):
+    """
+    Retorna una lista con los 3 ultimos elementos de una lista.
+    """
+    last = lt.subList(lista,lt.size(lista)-2,3)
+    return last
 
 #==========================
 # funciones de comparacion
@@ -232,6 +298,21 @@ def compareNacionalidad(nacionalidad, nacentry):
     else:
         return -1
 
+def compareFecha(fecha, fechaentry):
+    fechaentry = me.getKey(fechaentry)
+    if (str(fechaentry) == str(fecha)):
+        return 0
+    elif (str(fechaentry) < str(fecha)):
+        return 1
+    else:
+        return -1
+
+def compareSizes(nacionality1, nacionality2):
+    return (lt.size(nacionality1["obras"]) > lt.size(nacionality2["obras"]))
+
+def compareAlphabet(artwork1, artwork2):
+    return(artwork1["Title"] < artwork2["Title"])
+
 #================
 # requerimientos
 #================
@@ -258,3 +339,44 @@ def obrasAntiguas(catalog,n,medio):
         lt.addLast(antiguas,o)
         i += 1
     return antiguas
+
+def topNacionality(catalog):
+    """
+    Organiza el Top de Nacionalidades con más obras y tambien organiza 
+    alfabeticamente las obras de una nacionalidad.
+    """
+    keys = mp.keySet(catalog["nationality"])
+    top = lt.newList()
+    for key in lt.iterator(keys):
+        entry = mp.get(catalog["nationality"], key)
+        nac = me.getValue(entry)
+        lt.addLast(top, nac)
+    ms.sort(top, cmpfunction=compareSizes)
+    return top
+
+def organizeArtworkbyDate(catalog, startDate, finishDate):
+    """
+    Organiza y retorna las obras que esten en un rango de 
+    una fecha inicial y final.
+    """
+    org = lt.newList()
+    d_0 = date.fromisoformat(startDate)
+    d_f = date.fromisoformat(finishDate)
+    delta = d_f - d_0
+    for day in range(delta.days + 1):
+        new_day = d_0 + timedelta(days=day)
+        new_date = new_day.strftime("%Y-%m-%d")
+        getArtworksbyDate(catalog, new_date, org)
+    return org
+
+def countPurchase(artworks):
+    """
+    Cuenta la cantidad de obras que fueron adquiridas por compra.
+    """
+    size = lt.size(artworks)
+    count_p = 0
+    if size:
+        for artwork in lt.iterator(artworks):
+            if "purchase" in artwork["CreditLine"].lower():
+                count_p +=1    
+    return count_p

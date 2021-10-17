@@ -85,3 +85,40 @@ def obrasAntiguas(catalog,n,medio):
     """
     """
     return model.obrasAntiguas(catalog,n,medio)
+
+def topNacionality(catalog):
+    """
+    Organiza el Top de Nacionalidades con más obras y tambien organiza 
+    alfabeticamente las obras de una nacionalidad.
+    """
+    return model.topNacionality(catalog)
+
+def organizeArtworkbyDate(catalog, startDate, finishDate):
+    """
+    Organiza y retorna las obras que esten en un rango de 
+    una fecha inicial y final.
+    """
+    return model.organizeArtworkbyDate(catalog, startDate, finishDate)
+
+def countPurchase(artworks):
+    """
+    Cuenta la cantidad de obras que fueron adquiridas por compra.
+    """
+    return model.countPurchase(artworks)
+
+def getArtworksartists(catalog, codes):
+    """
+    """
+    return model.getArtworksartists(catalog, codes)
+
+def firstThreeD(lista):
+    """
+    Retorna una lista con los tres primeros elementos de una lista.
+    """
+    return model.firstThreeD(lista)
+    
+def lastThreeD(lista):
+    """
+    Retorna una lista con los 3 ultimos elementos de una lista.
+    """
+    return model.lastThreeD(lista)

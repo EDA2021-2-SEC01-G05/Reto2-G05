@@ -40,9 +40,10 @@ operación solicitadaooohdiohcoi
 
 def printMenu():
     print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- Ver las n obras mas antiguas para un medio especifico")
-    print("3- Cantidad de obras por nacionalidad.")
+    print("1- Cargar información en el catálogo.")
+    print("2- Ver las n obras mas antiguas para un medio especifico.")
+    print("3- Listar crónologicamente las adquisiciones.")
+    print("5- Clasificar las obras por la nacionalidad de sus creadores.")
     print("0-  Salir")
     
 def initCatalog():
@@ -68,8 +69,9 @@ def printArtworkData(artworks):
     if size>0:
         for artwork in lt.iterator(artworks):
             if artwork is not None:
-                print ("ID: " + artwork["ObjectID"] + ", Título: " + artwork["Title"] 
-                    + ", Fecha:  " + artwork["Date"] + ", Medio: " 
+                artistas = controller.getArtworksartists(catalog, artwork["ConstituentID"])
+                print ("ID: " + artwork["ObjectID"] + ", Título: " + artwork["Title"] + ", Artista(s): " + artistas
+                    + "Fecha:  " + artwork["Date"] + ", Medio: " 
                     + artwork["Medium"])
     else:
         print ("No se encontraron obras")
@@ -77,11 +79,46 @@ def printArtworkData(artworks):
 def tamañoNacionalidades(catalog):
     """
     """
-    keys = mp.keySet(catalog["nationality"])
-    for key in lt.iterator(keys):
-        entry = mp.get(catalog["nationality"], key)
-        nac = me.getValue(entry)
-        print (str(key) + ": " + str(lt.size(nac["obras"])))
+    top = controller.topNacionality(catalog)
+    first = lt.firstElement(top)
+    count = 0 
+    print(("-" * 15) + "Top Nacionalidades con más obras obras" + ("-" * 15) + "\n")
+    for x in range(1, 11):
+        nac = lt.getElement(top, x)
+        count += 1
+        print(str(count) + ". " + str(nac["nacionalidad"]) + ": " + str(lt.size(nac["obras"]))+ "\n")
+    top_1 = mp.get(catalog["nationality"], first["nacionalidad"])
+    valor = me.getValue(top_1)
+    obras = valor["obras"]
+    first_three = controller.firstThreeD(obras)
+    last_three = controller.lastThreeD(obras)
+    print("-" * 84)
+    print(("-" * 21) + "Estos son las 3 primeras Obras encontradas" + ("-" * 21) + "\n")
+    printArtworkData(first_three)
+    print("-" * 84)
+    print(("-" * 22) + "Estos son las 3 ultimas Obras encontradas" + ("-" * 21) + "\n")
+    printArtworkData(last_three)
+
+def artworksBydate(catalog, startDate, finishDate):
+    """
+    Genera una lista cronológicamente ordenada de las obras adquiridas 
+    por el museo en un rango de fecha. Retorna el total de obras en el rango cronológico, 
+    total de obras adquiridas por compra y las primeras 3 y utimas 3 obras del rango. ()()()
+    """
+    org_dates = controller.organizeArtworkbyDate(catalog, startDate, finishDate)
+    last = controller.lastThreeD(org_dates)
+    first = controller.firstThreeD(org_dates)
+    print("\n")
+    print("Total de obras en el rango " + str(startDate) + " - " + str(finishDate) + ": " + str(lt.size(org_dates))+ "\n") 
+    print("-" * 84 + "\n")
+    print("Total de obras compradas en el rango: " + str(controller.countPurchase(org_dates)) + "\n")
+    print("-" * 84)
+    print(("-" * 21) + "Estos son las 3 primeras Obras encontradas" + ("-" * 21) + "\n")
+    printArtworkData(first)
+    print("-" * 84)
+    print(("-" * 22) + "Estos son las 3 ultimas Obras encontradas" + ("-" * 21) + "\n")
+    printArtworkData(last)
+    print("-" * 84)
 
 #=================
 # requerimientos
@@ -118,8 +155,17 @@ while True:
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print ("Tiempo transcurrido: " + str(elapsed_time_mseg))
-
+    
     elif int(inputs[0]) == 3:
+        startDate = input("Fecha de Inicio (YYYY-MM-DD): ")
+        finishDate = input("Fecha Final (YYYY-MM-DD): ")
+        start_time = time.process_time()
+        artworksBydate(catalog, startDate, finishDate)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
+        print ("Tiempo transcurrido: " + str(elapsed_time_mseg))
+
+    elif int(inputs[0]) == 5:
         start_time = time.process_time()
         tamañoNacionalidades(catalog)
         stop_time = time.process_time()
