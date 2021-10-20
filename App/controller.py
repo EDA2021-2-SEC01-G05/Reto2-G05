@@ -23,6 +23,7 @@
 import config as cf
 import model
 import csv
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.khishdih
@@ -36,7 +37,7 @@ def initCatalog():
     """
     Llama la funcion de inicializacion del catalogo del modelo.
     """
-    t = "SINGLE_LINKED"
+    t = "ARRAY_LIST"
     catalog = model.newCatalog(t)
     return catalog
 
@@ -85,3 +86,93 @@ def obrasAntiguas(catalog,n,medio):
     """
     """
     return model.obrasAntiguas(catalog,n,medio)
+
+def topNacionality(catalog):
+    """
+    Organiza el Top de Nacionalidades con más obras y tambien organiza 
+    alfabeticamente las obras de una nacionalidad.
+    """
+    return model.topNacionality(catalog)
+
+def organizeArtworkbyDate(catalog, startDate, finishDate):
+    """
+    Organiza y retorna las obras que esten en un rango de 
+    una fecha inicial y final.
+    """
+    return model.organizeArtworkbyDate(catalog, startDate, finishDate)
+
+def countPurchase(artworks):
+    """
+    Cuenta la cantidad de obras que fueron adquiridas por compra.
+    """
+    return model.countPurchase(artworks)
+
+def getArtworksartists(catalog, codes):
+    """
+    """
+    return model.getArtworksartists(catalog, codes)
+
+def firstThreeD(lista):
+    """
+    Retorna una lista con los tres primeros elementos de una lista.
+    """
+    return model.firstThreeD(lista)
+    
+def lastThreeD(lista):
+    """
+    Retorna una lista con los 3 ultimos elementos de una lista.
+    """
+    return model.lastThreeD(lista)
+
+#-----------------
+# Requerimiento 1
+#-----------------
+
+def artistsbyAnioD(catalog,anio_inicial,anio_final):
+    """
+    """
+    return model.artistsbyAnioD(catalog,anio_inicial,anio_final)
+
+#-----------------
+# Requerimiento 3
+#-----------------
+
+def artworksbyArtistD(catalog,nombre):
+    """
+    """
+    return model.artworksbyArtistD(catalog,nombre)
+
+def artworksbyMediumD(obras):
+    """
+    """
+    return model.artworksbyMediumD(obras)
+
+def contarMediosD(obras):
+    """
+    """
+    return model.contarMediosD(obras)
+
+def medioMaxD(obras):
+    """
+    """
+    medio = lt.firstElement(obras)
+    return medio['Medium']
+
+#------------------
+# Requerimiento 5
+#------------------
+
+def artworksbyDepartmentD(catalog,department):
+    """
+    """
+    return model.artworksbyDepartmentD(catalog,department)
+
+def masCostosasD(catalog,department):
+    """
+    """
+    return model.masCostosasD(catalog,department)
+
+def masAntiguasD(catalog,department):
+    """
+    """
+    return model.masAntiguasD(catalog,department)
