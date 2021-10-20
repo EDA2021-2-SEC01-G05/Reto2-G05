@@ -26,11 +26,12 @@ import csv
 from DISClib.ADT import list as lt
 
 """
-El controlador se encarga de mediar entre la vista y el modelo.
+El controlador se encarga de mediar entre la vista y el modelo.khishdih
+
 """
-#=========================================================================
+#======================================
 # Inicialización del Catálogo de obras
-#=========================================================================
+#======================================
 
 def initCatalog():
     """
@@ -40,9 +41,9 @@ def initCatalog():
     catalog = model.newCatalog(t)
     return catalog
 
-#=========================================================================
+#==================================
 # Funciones para la carga de datos
-#=========================================================================
+#==================================
 
 def loadData(catalog):
     """
@@ -51,6 +52,16 @@ def loadData(catalog):
     """
     loadArtists(catalog)
     loadArtworks(catalog)
+    loadNationality(catalog)
+    
+def loadArtworks(catalog):
+    """
+    Carga las obras del archivo.
+    """
+    booksfile = cf.data_dir + 'MoMA/Artworks-utf8-large.csv'
+    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
+    for artwork in input_file:
+        model.addArtwork(catalog, artwork)   
 
 def loadArtists(catalog):
     """
@@ -60,79 +71,18 @@ def loadArtists(catalog):
     input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
     for artist in input_file:
         model.addArtist(catalog, artist)
-    
-def loadArtworks(catalog):
-    """
-    Carga las obras del archivo.
-    """
-    booksfile = cf.data_dir + 'MoMA/Artworks-utf8-large.csv'
-    input_file = csv.DictReader(open(booksfile, encoding='utf-8'))
-    for artwork in input_file:
-        model.addArtwork(catalog, artwork) 
 
-#=========================================================================
-# Funciones de los requerimientos
-#=========================================================================
+def loadNationality(catalog):
+    """
+    Carga las nacionalidades.
+    """
+    model.loadNationality(catalog)
 
-#-----------------
-# Requerimiento 1
-#-----------------
+#=================
+# requerimientos
+#=================
 
-def artistsbyAnioD(catalog,anio_inicial,anio_final):
-    """
-    """
-    return model.artistsbyAnioD(catalog,anio_inicial,anio_final)
-
-def firstThreeD(catalog):
-    """
-    """
-    return model.firstThreeD(catalog)
-
-def lastThreeD(catalog):
-    """
-    """
-    return model.lastThreeD(catalog)
-
-#-----------------
-# Requerimiento 3
-#-----------------
-
-def artworksbyArtistD(catalog,nombre):
-    """
-    """
-    return model.artworksbyArtistD(catalog,nombre)
-
-def artworksbyMediumD(obras):
-    """
-    """
-    return model.artworksbyMediumD(obras)
-
-def contarMediosD(obras):
-    """
-    """
-    return model.contarMediosD(obras)
-
-def medioMaxD(obras):
-    """
-    """
-    medio = lt.firstElement(obras)
-    return medio['Medium']
-
-#------------------
-# Requerimiento 5
-#------------------
-
-def artworksbyDepartmentD(catalog,department):
-    """
-    """
-    return model.artworksbyDepartmentD(catalog,department)
-
-def masCostosasD(catalog,department):
-    """
-    """
-    return model.masCostosasD(catalog,department)
-
-def masAntiguasD(catalog,department, n, medio):
+def obrasAntiguas(catalog,n,medio):
     """
     """
     return model.obrasAntiguas(catalog,n,medio)
@@ -225,5 +175,4 @@ def masCostosasD(catalog,department):
 def masAntiguasD(catalog,department):
     """
     """
-    return model.masAntiguasD(catalog,department)
     return model.masAntiguasD(catalog,department)

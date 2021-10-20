@@ -3,7 +3,7 @@
  * de Los Andes
  *
  *
- * Desarrollado para el curso ISIS1225 - Estructuras de Datos y Algoritmos
+ * Desarrolado para el curso ISIS1225 - Estructuras de Datos y Algoritmos
  *
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,20 +23,20 @@ import config as cf
 import sys
 import controller 
 from DISClib.ADT import list as lt
+from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapentry as me
 assert cf
 import time
-import secrets as mp
-import abc as me
 
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
 se hace la solicitud al controlador para ejecutar la
-operación solicitada
+operación solicitadaooohdiohcoi
 """
-#========================================================================
-# Funciones iniciales
-#========================================================================
+#=====================
+# funciones iniciales
+#=====================
 
 def printMenu():
     print("Bienvenido")
@@ -62,21 +62,11 @@ def loadData(catalog):
 
 catalog = None
 
-#========================================================================
-# Especificaciones de la impresion de datos
-#========================================================================
+#===========================================
+# especificaciones de la impresion de datos
+#===========================================
 
-def printArtistData_Req1(artists):
-    size = lt.size(artists)
-    if size>0:
-        for artist in lt.iterator(artists):
-            print ("Nombre: " + artist["DisplayName"] + ", Año nacimiento:  " 
-                    + artist["BeginDate"] + ", Año fallecimiento: " + artist["EndDate"]
-                    + ", Nacionalidad: " + artist["Nationality"] + ", Género: " + artist["Gender"])
-    else:
-        print ("No se encontraron artistas")
-
-def printArtworkData_Req3(artworks):
+def printArtworkData(artworks):
     size = lt.size(artworks)
     if size>0:
         for artwork in lt.iterator(artworks):
@@ -125,13 +115,9 @@ def printArtworkData_Req5(artworks):
                     + ", Costo de transporte (USD): " + str(int(artwork['Transcost (USD)'])))
     else:
         print ("No se encontraron artistas")
-def printArtworkData(lol):
-    """"""
-
+    
 def tamañoNacionalidades(catalog):
     """
-    Genera una lista cronológicamente ordenada de los artistas en un rango de anios.
-    Retorna el total de artistas en el rango cronológico, y los primeros 3 y ultimos 3 artistas del rango.
     """
     top = controller.topNacionality(catalog)
     first = lt.firstElement(top)
@@ -239,46 +225,25 @@ def requerimiento5(catalog,department):
     print("-" * 50)
     printArtworkData_Req5(costosas)
 
-def requerimiento5(catalog,department):
-    dep = controller.artworksbyDepartmentD(catalog,department)
-    peso = lt.removeLast(dep)
-    costo = lt.removeLast(dep)
-    tamano = lt.removeLast(dep)
-    antiguas = controller.masAntiguasD(catalog,department)
-    costosas = controller.masCostosasD(catalog,department)
-    print('Total de obras para transportar: ' + str(tamano))
-    print("-" * 50)
-    print('Costo total estimado de transportar las obras (USD): ' + str(costo))
-    print("-" * 50)
-    print('Peso total estimado de las obras (kg): ' + str(peso))
-    print("-" * 50)
-    print('Las 5 obras más antiguas a transportar son: ')
-    print("-" * 50)
-    printArtworkData_Req5(antiguas) 
-    print("-" * 50)
-    print('Las 5 obras más costosas a transportar son: ')
-    print("-" * 50)
-    printArtworkData_Req5(costosas)
-    
-#====================================================================================
+#=================
 # Menu principal
-#====================================================================================
+#=================
 
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
-        start_time = time.process_time()
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
+        start_time = time.process_time()
         loadData(catalog)
+        stop_time = time.process_time()
+        elapsed_time_mseg = (stop_time - start_time)*1000
         print("-" * 74)
         print('Obras cargadas: ' + str(lt.size(catalog['artworks']))+ "\n")
         print('Artistas cargados: ' + str(lt.size(catalog['artists'])) + "\n")
-        stop_time = time.process_time()
-        elapsed_time_mseg = (stop_time - start_time)*1000
-        print("Tiempo de ejecución: " + str(elapsed_time_mseg))
-
+        print ("Tiempo de carga: " + str(elapsed_time_mseg))
+    
     elif int(inputs[0]) == 2:
         anio_inicial = input("Ingrese el año inicial: ")
         anio_final = input("Ingrese el año final: ")
@@ -307,7 +272,7 @@ while True:
 
     elif int(inputs[0]) == 5:
         start_time = time.process_time()
-        requerimiento3(catalog,nombre)
+        tamañoNacionalidades(catalog)
         stop_time = time.process_time()
         elapsed_time_mseg = (stop_time - start_time)*1000
         print ("Tiempo transcurrido: " + str(elapsed_time_mseg))
