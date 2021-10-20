@@ -23,6 +23,7 @@
 import config as cf
 import model
 import csv
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.khishdih
@@ -36,7 +37,7 @@ def initCatalog():
     """
     Llama la funcion de inicializacion del catalogo del modelo.
     """
-    t = "SINGLE_LINKED"
+    t = "ARRAY_LIST"
     catalog = model.newCatalog(t)
     return catalog
 
@@ -122,3 +123,56 @@ def lastThreeD(lista):
     Retorna una lista con los 3 ultimos elementos de una lista.
     """
     return model.lastThreeD(lista)
+
+#-----------------
+# Requerimiento 1
+#-----------------
+
+def artistsbyAnioD(catalog,anio_inicial,anio_final):
+    """
+    """
+    return model.artistsbyAnioD(catalog,anio_inicial,anio_final)
+
+#-----------------
+# Requerimiento 3
+#-----------------
+
+def artworksbyArtistD(catalog,nombre):
+    """
+    """
+    return model.artworksbyArtistD(catalog,nombre)
+
+def artworksbyMediumD(obras):
+    """
+    """
+    return model.artworksbyMediumD(obras)
+
+def contarMediosD(obras):
+    """
+    """
+    return model.contarMediosD(obras)
+
+def medioMaxD(obras):
+    """
+    """
+    medio = lt.firstElement(obras)
+    return medio['Medium']
+
+#------------------
+# Requerimiento 5
+#------------------
+
+def artworksbyDepartmentD(catalog,department):
+    """
+    """
+    return model.artworksbyDepartmentD(catalog,department)
+
+def masCostosasD(catalog,department):
+    """
+    """
+    return model.masCostosasD(catalog,department)
+
+def masAntiguasD(catalog,department):
+    """
+    """
+    return model.masAntiguasD(catalog,department)
